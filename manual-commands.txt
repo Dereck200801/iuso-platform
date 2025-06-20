@@ -1,0 +1,29 @@
+COMMANDES SQL À EXÉCUTER MANUELLEMENT :
+
+1. Se connecter à PostgreSQL (avec pgAdmin, DBeaver, ou tout autre client)
+
+2. Exécuter ces commandes une par une :
+
+-- Ajouter les nouvelles colonnes
+ALTER TABLE inscrits ADD COLUMN IF NOT EXISTS genre VARCHAR(20);
+ALTER TABLE inscrits ADD COLUMN IF NOT EXISTS date_naissance DATE;
+ALTER TABLE inscrits ADD COLUMN IF NOT EXISTS lieu_naissance VARCHAR(100);
+ALTER TABLE inscrits ADD COLUMN IF NOT EXISTS nationalite VARCHAR(100);
+
+-- Créer les index
+CREATE INDEX IF NOT EXISTS idx_inscrits_genre ON inscrits(genre);
+CREATE INDEX IF NOT EXISTS idx_inscrits_date_naissance ON inscrits(date_naissance);
+CREATE INDEX IF NOT EXISTS idx_inscrits_lieu_naissance ON inscrits(lieu_naissance);
+CREATE INDEX IF NOT EXISTS idx_inscrits_nationalite ON inscrits(nationalite);
+
+-- Vérifier que ça a marché
+SELECT column_name, data_type FROM information_schema.columns WHERE table_name = 'inscrits' ORDER BY ordinal_position;
+
+3. Une fois terminé, le formulaire d'inscription sera fonctionnel !
+
+INFORMATIONS DE CONNEXION :
+- Host: localhost
+- Port: 5432
+- Database: postgres (ou le nom de votre base)
+- User: postgres (ou votre nom d'utilisateur)
+- Password: Reviti200801270206 

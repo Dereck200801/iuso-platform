@@ -1,0 +1,168 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Confirmez votre inscription - IUSO-SNE</title>
+  <style type="text/css">
+    @media only screen and (max-width: 600px) {
+      .container { width: 100% !important; max-width: none !important; }
+      .content { padding: 20px !important; }
+      .header { font-size: 24px !important; line-height: 1.3 !important; }
+      .button { width: 100% !important; padding: 16px !important; }
+      .hide-mobile { display: none !important; }
+      .mobile-center { text-align: center !important; }
+    }
+    
+    @media only screen and (max-width: 480px) {
+      .header { font-size: 20px !important; }
+      .content { padding: 15px !important; }
+    }
+  </style>
+</head>
+<body style="margin: 0; padding: 0; background-color: #f8fafc; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; line-height: 1.6;">
+  
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #f8fafc; min-height: 100vh;">
+    <tr>
+      <td align="center" style="padding: 20px;">
+        
+        <!-- Main Container -->
+        <table class="container" width="600" cellpadding="0" cellspacing="0" border="0" style="max-width: 600px; width: 100%; background-color: #ffffff; margin: 0 auto;">
+          
+          <!-- Header -->
+          <tr>
+            <td class="content" style="padding: 40px 30px 20px; text-align: center; border-bottom: 3px solid #134074;">
+              <div style="display: inline-block; background: #134074; color: white; padding: 6px 12px; border-radius: 16px; font-size: 12px; font-weight: 600; margin-bottom: 20px;">
+                🎓 IUSO-SNE
+              </div>
+              <h1 class="header" style="margin: 0; color: #134074; font-size: 28px; font-weight: 700; line-height: 1.2;">
+                Confirmez votre inscription
+              </h1>
+            </td>
+          </tr>
+          
+          <!-- Content -->
+          <tr>
+            <td class="content" style="padding: 30px;">
+              
+              <!-- Step indicator -->
+              <div style="text-align: center; margin-bottom: 30px;">
+                <div style="display: inline-flex; align-items: center; background: #f0f9ff; padding: 12px 16px; border-radius: 8px; border-left: 4px solid #0ea5e9;">
+                  <span style="font-size: 16px; margin-right: 8px;">📧</span>
+                  <span style="color: #0369a1; font-weight: 600; font-size: 14px;">Étape 2/3 : Vérification d'email</span>
+                </div>
+              </div>
+              
+              <!-- Main message -->
+              <div style="text-align: center; margin-bottom: 30px;">
+                <p style="margin: 0 0 15px; font-size: 16px; color: #374151;">
+                  Bonjour,<br>
+                  Votre demande d'inscription au concours IUSO-SNE a été reçue avec succès.
+                </p>
+                <p style="margin: 0 0 25px; font-size: 16px; color: #374151;">
+                  <strong style="color: #134074;">Pour finaliser votre candidature</strong>, cliquez sur le bouton ci-dessous :
+                </p>
+              </div>
+              
+              <!-- CTA Button -->
+              <div style="text-align: center; margin: 40px 0;">
+                <a href="{{ .SiteURL }}/verify-email?token={{ .TokenHash }}&type=signup" 
+                   class="button"
+                   style="display: inline-block; background: linear-gradient(135deg, #134074 0%, #1e5a8a 100%); color: #ffffff; padding: 16px 32px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 16px; box-shadow: 0 4px 12px rgba(19, 64, 116, 0.3); transition: all 0.3s ease;">
+                  ✅ Confirmer mon inscription
+                </a>
+              </div>
+              
+              <!-- Progress bar -->
+              <div style="margin: 30px 0; text-align: center;">
+                <div style="background: #e5e7eb; height: 4px; border-radius: 2px; margin: 20px auto; max-width: 300px;">
+                  <div style="background: #134074; height: 4px; border-radius: 2px; width: 66%;"></div>
+                </div>
+                <p style="margin: 10px 0 0; font-size: 13px; color: #6b7280;">
+                  Progression : 2/3 étapes complétées
+                </p>
+              </div>
+              
+              <!-- Timeline -->
+              <div style="background: #f9fafb; padding: 20px; border-radius: 8px; margin: 30px 0;">
+                <h3 style="margin: 0 0 15px; color: #134074; font-size: 16px; font-weight: 600;">Prochaines étapes :</h3>
+                
+                <div style="display: flex; align-items: center; margin-bottom: 12px;">
+                  <span style="color: #10b981; font-size: 16px; margin-right: 10px; min-width: 20px;">✓</span>
+                  <span style="color: #6b7280; font-size: 14px; text-decoration: line-through;">Formulaire d'inscription rempli</span>
+                </div>
+                
+                <div style="display: flex; align-items: center; margin-bottom: 12px;">
+                  <span style="color: #f59e0b; font-size: 16px; margin-right: 10px; min-width: 20px;">⏳</span>
+                  <span style="color: #134074; font-size: 14px; font-weight: 600;">Confirmation d'email (en cours)</span>
+                </div>
+                
+                <div style="display: flex; align-items: center;">
+                  <span style="color: #d1d5db; font-size: 16px; margin-right: 10px; min-width: 20px;">○</span>
+                  <span style="color: #9ca3af; font-size: 14px;">Validation du dossier par l'équipe</span>
+                </div>
+              </div>
+              
+              <!-- Warning -->
+              <div style="background: #fffbeb; border-left: 4px solid #f59e0b; padding: 15px; margin: 25px 0;">
+                <div style="display: flex; align-items: center;">
+                  <span style="color: #f59e0b; font-size: 18px; margin-right: 10px;">⏰</span>
+                  <div>
+                    <p style="margin: 0; color: #92400e; font-weight: 600; font-size: 14px;">
+                      Action requise dans les 24 heures
+                    </p>
+                    <p style="margin: 5px 0 0; color: #b45309; font-size: 13px;">
+                      Ce lien expire automatiquement pour votre sécurité.
+                    </p>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Alternative link -->
+              <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
+                <p style="margin: 0 0 10px; font-size: 13px; color: #6b7280;">
+                  Problème avec le bouton ? Copiez ce lien dans votre navigateur :
+                </p>
+                <p style="margin: 0; font-size: 12px; color: #9ca3af; word-break: break-all;">
+                  {{ .SiteURL }}/verify-email?token={{ .TokenHash }}&type=signup
+                </p>
+              </div>
+              
+            </td>
+          </tr>
+          
+          <!-- Footer -->
+          <tr>
+            <td style="background: #f8fafc; padding: 20px; text-align: center; border-top: 1px solid #e5e7eb;">
+              <p style="margin: 0 0 10px; font-size: 14px; color: #134074; font-weight: 600;">
+                IUSO-SNE
+              </p>
+              <p style="margin: 0 0 15px; font-size: 13px; color: #6b7280;">
+                Institut Universitaire des Sciences de l'Organisation • Secteur Nord Est
+              </p>
+              <div class="mobile-center">
+                <a href="mailto:concours@iuso-sne.org" style="color: #6b7280; text-decoration: none; font-size: 12px; margin-right: 15px;">
+                  📧 concours@iuso-sne.org
+                </a>
+                <span class="hide-mobile" style="color: #d1d5db; margin-right: 15px;">|</span>
+                <a href="https://www.iuso-sne.org" style="color: #6b7280; text-decoration: none; font-size: 12px;">
+                  🌐 www.iuso-sne.org
+                </a>
+              </div>
+              
+              <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #e5e7eb;">
+                <p style="margin: 0; font-size: 11px; color: #9ca3af;">
+                  Si vous n'avez pas demandé cette inscription, ignorez cet email.
+                </p>
+              </div>
+            </td>
+          </tr>
+          
+        </table>
+        
+      </td>
+    </tr>
+  </table>
+  
+</body>
+</html> 

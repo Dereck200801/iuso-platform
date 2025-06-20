@@ -1,0 +1,137 @@
+	MOT DE PASSE DE LA BASE DE DONNÉE : Reviti200801270206
+
+
+	*	En PSQL
+Clés API
+	anonpublic : eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImltZXJrc2FvZWZtenJzZnBvYW1yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTAzNTQ3MjAsImV4cCI6MjA2NTkzMDcyMH0.7fpNjsSxXGz_9SvWETG6ZRLqrb47ffvEvbrL9KkO4vQ
+
+	service_rolesecret : eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImltZXJrc2FvZWZtenJzZnBvYW1yIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1MDM1NDcyMCwiZXhwIjoyMDY1OTMwNzIwfQ.BTv39Y4iP2NvMSW_R9WD4Xnr91RAVWyt-kEGTdT7IMA
+
+URL du projet : https://imerksaoefmzrsfpoamr.supabase.co
+
+	Chaîne de connexion :
+
+- Connexion directe
+Idéal pour les applications avec des connexions persistantes et de longue durée, telles que celles exécutées sur des machines virtuelles ou des conteneurs de longue durée.
+
+psql -h db.imerksaoefmzrsfpoamr.supabase.co -p 5432 -d postgres -U postgres
+
+hôte :
+db.imerksaoefmzrsfpoamr.supabase.co
+
+port :
+5432
+
+base de données :
+postgres
+
+utilisateur :
+postgres
+
+
+
+- pooler de transactions
+Idéal pour les applications sans état comme les fonctions sans serveur où chaque interaction avec Postgres est brève et isolée.
+
+psql -h aws-0-us-east-2.pooler.supabase.com -p 6543 -d postgres -U postgres.imerksaoefmzrsfpoamr
+
+
+hôte :
+aws-0-us-east-2.pooler.supabase.com
+
+port :
+6543
+
+base de données :
+postgres
+
+utilisateur :
+postgres.imerksaoefmzrsfpoamr
+
+mode_piscine :
+transaction
+
+
+
+- pooler de sessions
+Recommandé uniquement comme alternative à la connexion directe, lors de la connexion via un réseau IPv4.
+
+psql -h aws-0-us-east-2.pooler.supabase.com -p 5432 -d postgres -U postgres.imerksaoefmzrsfpoamr
+
+hôte :
+aws-0-us-east-2.pooler.supabase.com
+
+port :
+5432
+
+base de données :
+postgres
+
+utilisateur :
+postgres.imerksaoefmzrsfpoamr
+
+mode_piscine :
+session
+
+
+	*	En URI
+
+- Connexion directe
+Idéal pour les applications avec des connexions persistantes et de longue durée, telles que celles exécutées sur des machines virtuelles ou des conteneurs de longue durée.
+
+postgresql://postgres:[YOUR-PASSWORD]@db.imerksaoefmzrsfpoamr.supabase.co:5432/postgres
+
+hôte :
+db.imerksaoefmzrsfpoamr.supabase.co
+
+port :
+5432
+
+base de données :
+postgres
+
+utilisateur :
+postgres
+
+- pooler de transactions
+Pooler partagé
+Idéal pour les applications sans état comme les fonctions sans serveur où chaque interaction avec Postgres est brève et isolée.
+
+postgresql://postgres.imerksaoefmzrsfpoamr:[YOUR-PASSWORD]@aws-0-us-east-2.pooler.supabase.com:6543/postgres
+
+hôte :
+aws-0-us-east-2.pooler.supabase.com
+
+port :
+6543
+
+base de données :
+postgres
+
+utilisateur :
+postgres.imerksaoefmzrsfpoamr
+
+mode_piscine :
+transaction
+
+
+- pooler de sessions
+Pooler partagé
+Recommandé uniquement comme alternative à la connexion directe, lors de la connexion via un réseau IPv4.
+
+postgresql://postgres.imerksaoefmzrsfpoamr:[YOUR-PASSWORD]@aws-0-us-east-2.pooler.supabase.com:5432/postgres
+
+hôte :
+aws-0-us-east-2.pooler.supabase.com
+
+port :
+5432
+
+base de données :
+postgres
+
+utilisateur :
+postgres.imerksaoefmzrsfpoamr
+
+mode_piscine :
+session

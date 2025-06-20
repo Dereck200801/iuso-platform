@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  # Use working alternatives for problematic images
+  db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_HOST: /var/run/postgresql
+      PGPORT: ${POSTGRES_PORT}
+      POSTGRES_PORT: ${POSTGRES_PORT}
+      PGPASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      PGDATABASE: ${POSTGRES_DB}
+      POSTGRES_DB: ${POSTGRES_DB}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXP: ${JWT_EXPIRY}
+    volumes:
+      - ./volumes/db/data:/var/lib/postgresql/data:Z
+    command: ["postgres", "-c", "log_min_messages=fatal"]
+  
+  # Skip problematic services for now - focus on core functionality
+  studio:
+    image: hello-world
+    command: ["echo", "Studio disabled - use external Supabase Studio"]
+  
+  vector:
+    image: hello-world
+    command: ["echo", "Vector disabled"]
+  
+  imgproxy:
+    image: hello-world
+    command: ["echo", "Imgproxy disabled"]
+  
+  analytics:
+    image: hello-world
+    command: ["echo", "Analytics disabled"]
+  
+  rest:
+    image: ghcr.io/postgrest/postgrest:v11.2.2
+  
+  realtime:
+    image: ghcr.io/supabase/realtime:v2.25.65
+  
+  storage:
+    image: ghcr.io/supabase/storage-api:v0.46.4
+  
+  meta:
+    image: ghcr.io/supabase/postgres-meta:v0.68.0
+  
+  functions:
+    image: ghcr.io/supabase/edge-runtime:v1.22.4 

@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Confirmation d'inscription - IUSO-SNE</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: 'Gilroy', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif; background-color: #f8fafc;">
+  
+  <div style="max-width: 600px; margin: 0 auto; padding: 40px 20px; background: linear-gradient(135deg, #f8fafc 0%, #ffffff 50%, #dbeafe 100%);">
+    
+    <!-- Background decorative elements -->
+    <div style="position: relative;">
+      
+      <!-- Main Content Card avec effet glassmorphism -->
+      <div style="background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px); border-radius: 16px; border: 1px solid rgba(226, 232, 240, 0.8); box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); padding: 40px; margin-bottom: 24px; position: relative; overflow: hidden;">
+        
+        <!-- Gradient overlay subtil -->
+        <div style="position: absolute; top: 0; right: 0; width: 200px; height: 200px; background: radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, transparent 70%); pointer-events: none;"></div>
+        
+        <!-- Badge de statut -->
+        <div style="text-align: center; margin-bottom: 32px;">
+          <span style="display: inline-flex; align-items: center; gap: 8px; background: rgba(255, 255, 255, 0.9); border: 1px solid rgba(16, 185, 129, 0.3); color: #059669; padding: 8px 16px; border-radius: 20px; font-size: 14px; font-weight: 600; font-family: 'Gilroy', sans-serif; box-shadow: 0 2px 4px rgba(16, 185, 129, 0.1);">
+            <span style="font-size: 16px;">🎓</span> Concours L1 & BTS
+          </span>
+        </div>
+        
+        <!-- Title avec gradient -->
+        <h1 style="color: #0f172a; margin: 0 0 32px 0; font-size: 32px; font-weight: 800; text-align: center; line-height: 1.2; font-family: 'Gilroy', sans-serif;">
+          Confirmez votre
+          <span style="background: linear-gradient(135deg, #3b82f6 0%, #10b981 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+            inscription au concours
+          </span>
+        </h1>
+        
+        <!-- Greeting -->
+        <p style="color: #475569; font-size: 16px; line-height: 1.6; margin: 0 0 16px 0; font-family: 'Gilroy', sans-serif;">Bonjour,</p>
+        
+        <!-- Main text -->
+        <p style="color: #475569; font-size: 16px; line-height: 1.6; margin: 0 0 24px 0; font-family: 'Gilroy', sans-serif;">
+          Merci de vous être inscrit(e) au concours d'entrée IUSO-SNE ! Votre candidature a été pré-enregistrée avec succès.
+        </p>
+        
+        <p style="color: #475569; font-size: 16px; line-height: 1.6; margin: 0 0 32px 0; font-family: 'Gilroy', sans-serif;">
+          Pour <strong style="color: #134074; font-family: 'Gilroy', sans-serif;">finaliser votre inscription</strong> et activer officiellement votre candidature, veuillez confirmer votre adresse email :
+        </p>
+        
+        <!-- CTA Button avec gradient moderne -->
+        <div style="text-align: center; margin: 40px 0;">
+          <a href="{{ .ConfirmationURL }}" style="display: inline-flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #134074 0%, #1e5a9e 100%); color: white; padding: 14px 32px; text-decoration: none; border-radius: 12px; font-weight: 600; font-size: 16px; box-shadow: 0 4px 14px 0 rgba(19, 64, 116, 0.3), 0 1px 3px 0 rgba(0, 0, 0, 0.1); font-family: 'Gilroy', sans-serif; transition: all 0.3s;">
+            ✅ Confirmer mon inscription
+          </a>
+        </div>
+        
+        <!-- Warning Alert avec style moderne -->
+        <div style="background: rgba(254, 243, 199, 0.5); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 12px; padding: 16px 20px; margin: 32px 0; border-left: 4px solid #f59e0b; backdrop-filter: blur(5px);">
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <span style="font-size: 20px;">⏰</span>
+            <p style="margin: 0; color: #92400e; font-size: 14px; font-weight: 600; font-family: 'Gilroy', sans-serif;">
+              Important : Ce lien est valide pendant 24 heures seulement.
+            </p>
+          </div>
+        </div>
+        
+        <!-- Success Preview avec glassmorphism -->
+        <div style="background: rgba(240, 253, 244, 0.6); border: 1px solid rgba(34, 197, 94, 0.2); border-radius: 12px; padding: 24px; margin: 32px 0; backdrop-filter: blur(5px); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
+          <h3 style="color: #15803d; margin: 0 0 16px 0; font-size: 18px; font-weight: 700; display: flex; align-items: center; gap: 8px; font-family: 'Gilroy', sans-serif;">
+            <span style="font-size: 20px;">🎉</span> Après confirmation :
+          </h3>
+          <div style="color: #166534; font-size: 14px; line-height: 1.8; font-family: 'Gilroy', sans-serif;">
+            <div style="margin-bottom: 8px; display: flex; align-items: center; gap: 8px;">
+              <span style="color: #22c55e;">✓</span>
+              <span style="font-weight: 500;">Votre candidature sera automatiquement enregistrée</span>
+            </div>
+            <div style="margin-bottom: 8px; display: flex; align-items: center; gap: 8px;">
+              <span style="color: #22c55e;">✓</span>
+              <span style="font-weight: 500;">Vous recevrez votre numéro de dossier officiel</span>
+            </div>
+            <div style="margin-bottom: 8px; display: flex; align-items: center; gap: 8px;">
+              <span style="color: #22c55e;">✓</span>
+              <span style="font-weight: 500;">Vous pourrez accéder à votre espace candidat</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="color: #22c55e;">✓</span>
+              <span style="font-weight: 500;">Vous pourrez suivre l'évolution de votre dossier</span>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Separator avec style moderne -->
+        <div style="height: 1px; background: linear-gradient(90deg, transparent, rgba(226, 232, 240, 0.8), transparent); margin: 40px 0;"></div>
+        
+        <!-- Secondary Info -->
+        <p style="color: #64748b; font-size: 14px; line-height: 1.6; margin: 0 0 32px 0; text-align: center; font-family: 'Gilroy', sans-serif;">
+          Si vous n'avez pas demandé cette inscription, vous pouvez ignorer cet email en toute sécurité.
+        </p>
+        
+        <!-- Signature avec style moderne -->
+        <div style="text-align: center;">
+          <p style="color: #475569; margin: 0; font-size: 16px; line-height: 1.5; font-family: 'Gilroy', sans-serif;">
+            Cordialement,<br>
+            <strong style="color: #134074; font-weight: 700; font-size: 18px; font-family: 'Gilroy', sans-serif;">L'équipe IUSO-SNE</strong>
+          </p>
+        </div>
+      </div>
+
+      <!-- Footer moderne avec glassmorphism -->
+      <div style="background: rgba(248, 250, 252, 0.8); backdrop-filter: blur(5px); border: 1px solid rgba(226, 232, 240, 0.5); border-radius: 12px; padding: 24px; text-align: center;">
+        <div style="display: flex; align-items: center; justify-content: center; gap: 16px; flex-wrap: wrap;">
+          <span style="color: #64748b; font-size: 13px; font-family: 'Gilroy', sans-serif;">
+            <span style="color: #134074; font-weight: 600;">IUSO-SNE</span> • Institut Universitaire des Sciences de l'Organisation
+          </span>
+        </div>
+        <div style="margin-top: 12px; display: flex; align-items: center; justify-content: center; gap: 20px; flex-wrap: wrap;">
+          <a href="mailto:concours@iuso-sne.org" style="color: #64748b; font-size: 12px; text-decoration: none; display: flex; align-items: center; gap: 4px; font-family: 'Gilroy', sans-serif;">
+            <span style="color: #134074;">📧</span> concours@iuso-sne.org
+          </a>
+          <a href="https://www.iuso-sne.org" style="color: #64748b; font-size: 12px; text-decoration: none; display: flex; align-items: center; gap: 4px; font-family: 'Gilroy', sans-serif;">
+            <span style="color: #134074;">🌐</span> www.iuso-sne.org
+          </a>
+        </div>
+      </div>
+      
+      <!-- Decorative dots pattern -->
+      <div style="text-align: center; margin-top: 24px;">
+        <span style="display: inline-block; width: 6px; height: 6px; background: #e2e8f0; border-radius: 50%; margin: 0 4px;"></span>
+        <span style="display: inline-block; width: 6px; height: 6px; background: #cbd5e1; border-radius: 50%; margin: 0 4px;"></span>
+        <span style="display: inline-block; width: 6px; height: 6px; background: #94a3b8; border-radius: 50%; margin: 0 4px;"></span>
+      </div>
+    </div>
+  </div>
+  
+</body>
+</html> 
