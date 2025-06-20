@@ -1,6 +1,8 @@
 import { useEffect } from 'react'
-import { Routes, Route, Navigate } from 'react-router-dom'
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { AuthProvider } from './components/AuthProvider'
+import { CandidatDataProvider } from './hooks/useCandidatData'
+import { AutoSyncProvider } from './hooks/useAutoSync'
 import { ProtectedRoute } from './components/ProtectedRoute'
 import { Layout } from './components/Layout'
 import { Toaster } from './components/ui/toast'
@@ -17,16 +19,66 @@ import EmailVerificationPage from './pages/EmailVerificationPage'
 import AdminPage from './pages/admin/AdminPage'
 import AdminDossiersPage from './pages/admin/AdminDossiersPage'
 import AdminMessagingPage from './pages/admin/AdminMessagingPage'
+import AboutPage from './pages/AboutPage'
+import ContactPage from './pages/ContactPage'
+import FAQPage from './pages/FAQPage'
+import LegalPage from './pages/LegalPage'
+import PrivacyPolicyPage from './pages/PrivacyPolicyPage'
+import TermsPage from './pages/TermsPage'
+import CookiesPage from './pages/CookiesPage'
+
 
 // AutoSync System
 import { initAutoSave } from './utils/autoSave'
 import { SyncLogger } from './utils/syncLogger'
 
+// Analytics
+import { analytics } from './utils/analytics'
+
 import './App.css'
 
+// Composants wrapper pour les pages avec footer simplifié
+const LoginPageWrapper = () => (
+  <Layout simpleFooter={true}>
+    <LoginPage />
+  </Layout>
+)
+
+const InscriptionPageWrapper = () => (
+  <Layout simpleFooter={true}>
+    <InscriptionPage />
+  </Layout>
+)
+
+const ConfirmationPageWrapper = () => (
+  <Layout simpleFooter={true}>
+    <ConfirmationPage />
+  </Layout>
+)
+
 function App() {
+  const location = useLocation()
+
+  // Initialiser Google Analytics
   useEffect(() => {
-    // Initialiser le système d'automatisation Supabase
+    analytics.initialize()
+  }, [])
+
+  // Suivre les changements de page
+  useEffect(() => {
+    analytics.trackPageView(location.pathname)
+  }, [location])
+
+  useEffect(() => {
+    // ⚠️ SYSTÈME AUTOSYNC TEMPORAIREMENT DÉSACTIVÉ
+    // Pour résoudre le problème de récréation automatique de données de test
+    console.log('⚠️ Système AutoSync désactivé pour éviter la récréation automatique de données')
+    
+    // TODO: Réactiver après résolution complète du problème
+    // et configuration de filtres pour exclure les données de test
+    
+    /*
+    // Code AutoSync désactivé temporairement
     console.log('🚀 Initialisation du système AutoSync...')
     
     try {
@@ -75,6 +127,7 @@ function App() {
         console.log('🧹 Système AutoSync nettoyé')
       }
     }
+    */
   }, [])
 
   // Gestion des erreurs non capturées
@@ -132,60 +185,124 @@ function App() {
 
   return (
     <AuthProvider>
-      <ScrollToTop />
-      <Layout>
-        <Routes>
-          {/* Routes publiques */}
-          <Route path="/" element={<HomePage />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/inscription" element={<InscriptionPage />} />
-          <Route path="/formations" element={<FormationsPage />} />
-          <Route path="/confirmation" element={<ConfirmationPage />} />
-          <Route path="/verify-email" element={<EmailVerificationPage />} />
+      <CandidatDataProvider>
+        <AutoSyncProvider>
+          <ScrollToTop />
+          <Routes>
+        {/* Pages avec footer simplifié */}
+        <Route path="/login" element={<LoginPageWrapper />} />
+        <Route path="/inscription" element={<InscriptionPageWrapper />} />
+        <Route path="/confirmation" element={<ConfirmationPageWrapper />} />
 
-          {/* Routes protégées */}
-          <Route
-            path="/dashboard"
-            element={
-              <ProtectedRoute>
-                <DashboardPage />
-              </ProtectedRoute>
-            }
-          />
+        {/* Pages avec footer complet */}
+        <Route path="/" element={
+          <Layout>
+            <HomePage />
+          </Layout>
+        } />
+        <Route path="/formations" element={
+          <Layout>
+            <FormationsPage />
+          </Layout>
+        } />
+        <Route path="/verify-email" element={
+          <Layout>
+            <EmailVerificationPage />
+          </Layout>
+        } />
+        <Route path="/about" element={
+          <Layout>
+            <AboutPage />
+          </Layout>
+        } />
+        <Route path="/contact" element={
+          <Layout>
+            <ContactPage />
+          </Layout>
+        } />
+        <Route path="/faq" element={
+          <Layout>
+            <FAQPage />
+          </Layout>
+        } />
 
-          {/* Routes admin */}
-          <Route
-            path="/admin"
-            element={
-              <ProtectedRoute requiredRole="admin">
+        {/* Pages légales */}
+        <Route path="/legal" element={
+          <Layout>
+            <LegalPage />
+          </Layout>
+        } />
+        <Route path="/privacy" element={
+          <Layout>
+            <PrivacyPolicyPage />
+          </Layout>
+        } />
+        <Route path="/terms" element={
+          <Layout>
+            <TermsPage />
+          </Layout>
+        } />
+        <Route path="/cookies" element={
+          <Layout>
+            <CookiesPage />
+          </Layout>
+        } />
+
+        {/* Routes protégées - Dashboard sans Layout car il a son propre layout */}
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <DashboardPage />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Routes supprimées - Fonctionnalités intégrées dans le dashboard */}
+        <Route path="/profile" element={<Navigate to="/dashboard" replace />} />
+        <Route path="/documents" element={<Navigate to="/dashboard" replace />} />
+        <Route path="/messages" element={<Navigate to="/dashboard" replace />} />
+
+        {/* Routes admin */}
+        <Route
+          path="/admin"
+          element={
+            <Layout>
+              <ProtectedRoute requireAdmin>
                 <AdminPage />
               </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/admin/dossiers"
-            element={
-              <ProtectedRoute requiredRole="admin">
+            </Layout>
+          }
+        />
+        <Route
+          path="/admin/dossiers"
+          element={
+            <Layout>
+              <ProtectedRoute requireAdmin>
                 <AdminDossiersPage />
               </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/admin/messages"
-            element={
-              <ProtectedRoute requiredRole="admin">
+            </Layout>
+          }
+        />
+        <Route
+          path="/admin/messages"
+          element={
+            <Layout>
+              <ProtectedRoute requireAdmin>
                 <AdminMessagingPage />
               </ProtectedRoute>
-            }
-          />
+            </Layout>
+          }
+        />
 
-          {/* Redirection par défaut */}
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
+        {/* Redirection par défaut */}
+        <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
 
-        {/* Toast notifications */}
-        <Toaster />
-      </Layout>
+          {/* Toast notifications */}
+          <Toaster />
+        </AutoSyncProvider>
+      </CandidatDataProvider>
     </AuthProvider>
   )
 }

@@ -44,16 +44,7 @@ const LoginPage = () => {
   const onSubmit = async (data: LoginForm) => {
     setLoading(true)
     try {
-      const result = await signIn(data.email, data.password)
-      
-      if (result.error) {
-        toast({
-          title: 'Erreur de connexion',
-          description: 'Email ou mot de passe incorrect',
-          variant: 'destructive',
-        })
-        return
-      }
+      await signIn(data.email, data.password)
 
       toast({
         title: 'Connexion réussie',
@@ -61,10 +52,23 @@ const LoginPage = () => {
       })
 
       navigate('/dashboard')
-    } catch (error) {
+    } catch (error: any) {
+      /* ---------------------------------------------------------
+       * Interprétation des erreurs courantes de Supabase Auth
+       * ------------------------------------------------------- */
+      let description = 'Une erreur est survenue lors de la connexion'
+
+      if (error?.message?.includes('Invalid login credentials')) {
+        description = 'Email ou mot de passe incorrect'
+      } else if (error?.message?.includes('Email not confirmed')) {
+        description = 'Veuillez confirmer votre adresse e-mail avant de vous connecter (lien reçu par courriel)'
+      } else if (typeof error?.message === 'string') {
+        description = error.message
+      }
+
       toast({
         title: 'Erreur',
-        description: 'Une erreur est survenue lors de la connexion',
+        description,
         variant: 'destructive',
       })
     } finally {

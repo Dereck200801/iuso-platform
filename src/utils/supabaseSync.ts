@@ -49,7 +49,7 @@ export async function syncToSupabase(options: SyncOptions = {}): Promise<SyncRes
         
         if (error) {
           results.failed++
-          results.errors.push(error.message || 'Erreur inconnue')
+          results.errors.push((error as any)?.message ?? 'Erreur inconnue')
         } else {
           results.success++
         }

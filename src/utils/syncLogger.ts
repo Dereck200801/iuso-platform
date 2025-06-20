@@ -7,6 +7,9 @@ export interface LogEntry {
   sessionId?: string
 }
 
+// Déclaration globale optionnelle pour Google Analytics
+declare const gtag: (...args: any[]) => void
+
 export class SyncLogger {
   private static maxLogs = 100
   private static sessionId = crypto.randomUUID()

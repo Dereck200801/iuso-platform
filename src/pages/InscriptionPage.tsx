@@ -101,13 +101,31 @@ const inscriptionSchema = z.object({
   // Documents
   photo_identite: z.any()
     .refine((files) => files?.length > 0, 'La photo d\'identité est requise')
-    .refine((files) => files?.[0]?.size <= 2 * 1024 * 1024, 'La photo ne doit pas dépasser 2 MB')
-    .refine((files) => ['image/jpeg', 'image/png'].includes(files?.[0]?.type), 'Format accepté: JPEG, PNG'),
+    .refine((files) => {
+      const file = files?.[0]
+      if (!file) return false
+      console.log('📷 Validation Zod photo:', { name: file.name, type: file.type, size: file.size })
+      return file.size <= 2 * 1024 * 1024
+    }, 'La photo ne doit pas dépasser 2 MB')
+    .refine((files) => {
+      const file = files?.[0]
+      if (!file) return false
+      return ['image/jpeg', 'image/jpg', 'image/png'].includes(file.type) && file.type !== 'application/json'
+    }, 'Format accepté: JPEG, PNG uniquement'),
   
   attestation_bac: z.any()
     .refine((files) => files?.length > 0, 'L\'attestation du Baccalauréat est requise')
-    .refine((files) => files?.[0]?.size <= 5 * 1024 * 1024, 'Le document ne doit pas dépasser 5 MB')
-    .refine((files) => ['application/pdf', 'image/jpeg', 'image/png'].includes(files?.[0]?.type), 'Format accepté: PDF, JPEG, PNG'),
+    .refine((files) => {
+      const file = files?.[0]
+      if (!file) return false
+      console.log('📄 Validation Zod bac:', { name: file.name, type: file.type, size: file.size })
+      return file.size <= 5 * 1024 * 1024
+    }, 'Le document ne doit pas dépasser 5 MB')
+    .refine((files) => {
+      const file = files?.[0]
+      if (!file) return false
+      return ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'].includes(file.type) && file.type !== 'application/json'
+    }, 'Format accepté: PDF, JPEG, PNG uniquement'),
   
   // Acceptation
   acceptation_conditions: z.boolean().refine((val) => val === true, 'Vous devez accepter les conditions d\'utilisation')
@@ -208,16 +226,16 @@ const InscriptionPage = () => {
 
   const onSubmit = async (data: InscriptionForm) => {
     setLoading(true)
-    console.log('🔥 DEBUT FONCTION onSubmit - MODE DIRECT')
+    console.log('🔥 DEBUT FONCTION onSubmit - MODE SECURISE')
     console.log('🔥 Email soumis:', data.email)
-    console.log('🔥 Aucun appel à auth.signUp() ne sera fait')
-    console.log('🔥 Aucune insertion dans inscrits_temp ne sera faite')
+    
+    let authUserId: string | null = null // Tracker l'ID du compte Auth créé pour cleanup si besoin
     
     try {
-      // 🚀 INSCRIPTION DIRECTE : Sans confirmation email
-      console.log('🚀 Inscription directe activée')
+      // Étape 1 : Vérifications préliminaires AVANT création du compte Auth
+      console.log('🔍 Vérification préliminaire de l\'email...')
       
-      // 1. Vérifier si l'email existe déjà dans la table inscrits
+      // Vérifier si l'email existe déjà dans la table inscrits
       const { data: existingCandidate, error: checkError } = await supabase
         .from('inscrits')
         .select('email')
@@ -228,15 +246,29 @@ const InscriptionPage = () => {
         throw new Error('Cette adresse email est déjà enregistrée pour une inscription. Veuillez utiliser une autre adresse.')
       }
 
-      // 2. Générer un numéro de dossier unique
+      // Étape 2 : Uploads des documents AVANT création du compte Auth
+      console.log('📁 Upload des documents...')
+      
+      // Générer un numéro de dossier unique
       const numeroDossier = `LIC${new Date().getFullYear().toString().slice(-2)}${Date.now().toString().slice(-6)}`
       
-      // 3. Créer un ID utilisateur temporaire
+      // Créer un ID utilisateur temporaire pour les uploads
       const tempUserId = `temp_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
 
-      // 4. Upload de la photo d'identité
+      // 4. Validation et upload de la photo d'identité
+      const photoFile = data.photo_identite[0]
+      console.log('📷 Photo file info:', {
+        name: photoFile?.name,
+        type: photoFile?.type,
+        size: photoFile?.size
+      })
+      
+      if (!photoFile || !photoFile.type.startsWith('image/')) {
+        throw new Error('Veuillez sélectionner un fichier image valide pour la photo d\'identité (JPEG ou PNG)')
+      }
+      
       const photoResult = await photoUpload.uploadFile(
-        data.photo_identite[0], 
+        photoFile, 
         `photo_${tempUserId}_${Date.now()}`
       )
       
@@ -244,9 +276,20 @@ const InscriptionPage = () => {
         throw new Error(`Erreur upload photo: ${photoResult.error}`)
       }
 
-      // 5. Upload de l'attestation du bac
+      // 5. Validation et upload de l'attestation du bac
+      const bacFile = data.attestation_bac[0]
+      console.log('📄 Bac file info:', {
+        name: bacFile?.name,
+        type: bacFile?.type,
+        size: bacFile?.size
+      })
+      
+      if (!bacFile) {
+        throw new Error('Veuillez sélectionner un fichier pour l\'attestation du baccalauréat')
+      }
+      
       const bacResult = await bacUpload.uploadFile(
-        data.attestation_bac[0], 
+        bacFile, 
         `bac_${tempUserId}_${Date.now()}`
       )
       
@@ -254,8 +297,29 @@ const InscriptionPage = () => {
         throw new Error(`Erreur upload attestation: ${bacResult.error}`)
       }
 
-      // 6. Préparer les données pour insertion directe dans inscrits
-      const inscriptionData = {
+      console.log('✅ Tous les uploads réussis, création du compte Auth...')
+
+      // Étape 3 : Création du compte dans Supabase Auth SEULEMENT après validations
+      const { data: signUpRes, error: signUpErr } = await supabase.auth.signUp({
+        email: data.email,
+        password: data.mot_de_passe,
+        options: {
+          emailRedirectTo: `${window.location.origin}/confirmation`,
+        },
+      })
+
+      if (signUpErr) {
+        const msg = signUpErr.message?.includes('User already registered')
+          ? 'Cette adresse email possède déjà un compte. Essayez de vous connecter.'
+          : signUpErr.message
+        throw new Error(msg)
+      }
+
+      authUserId = signUpRes.user!.id
+      console.log('✅ Compte Auth créé avec succès:', authUserId)
+
+      // Étape 4 : Préparer les données pour insertion dans inscrits
+      const inscriptionData: any = {
         numero_dossier: numeroDossier,
         email: data.email,
         prenom: data.prenom,
@@ -271,14 +335,15 @@ const InscriptionPage = () => {
         mot_de_passe: data.mot_de_passe,
         photo_identite_url: photoResult.path,
         attestation_bac_url: bacResult.path,
-        statut: 'en_attente_validation',
+        statut: 'en_attente',
         email_verified_at: new Date().toISOString(),
         date_inscription: new Date().toISOString(),
-        date_modification: new Date().toISOString()
+        date_modification: new Date().toISOString(),
+        auth_user_id: authUserId
       }
 
-      // 7. Insérer directement dans la table inscrits
-      console.log('🔥 INSERTION DIRECTE DANS INSCRITS - PAS DE AUTH.SIGNUP')
+      // Étape 5 : Insertion finale dans la table inscrits
+      console.log('🔥 INSERTION FINALE DANS INSCRITS')
       console.log('🔥 Données à insérer:', { email: inscriptionData.email, numero_dossier: inscriptionData.numero_dossier })
       
       const { data: insertResult, error: insertError } = await supabase
@@ -288,22 +353,63 @@ const InscriptionPage = () => {
 
       if (insertError) {
         console.error('Erreur insertion dans inscrits:', insertError)
+        
+        // ROLLBACK : Supprimer le compte Auth créé si l'insertion échoue
+        if (authUserId) {
+          console.log('🔄 ROLLBACK: Tentative de suppression du compte Auth créé...')
+          try {
+            // Option 1: Utiliser une fonction Edge pour le rollback (recommandé)
+            const { error: rollbackError } = await supabase.functions.invoke('auth-rollback', {
+              body: { userId: authUserId }
+            })
+            
+            if (rollbackError) {
+              console.error('Erreur rollback via fonction:', rollbackError)
+              
+                             // Option 2: Fallback - Marquer le compte comme à supprimer
+               console.log('💾 Sauvegarde du compte orphelin pour nettoyage ultérieur...')
+               const { error: saveError } = await supabase
+                 .from('orphaned_auth_accounts')
+                 .insert({
+                   auth_user_id: authUserId,
+                   email: data.email,
+                   created_at: new Date().toISOString(),
+                   reason: 'inscription_failed'
+                 })
+               if (saveError) {
+                 console.error('Erreur sauvegarde compte orphelin:', saveError)
+               }
+            } else {
+              console.log('✅ Compte Auth supprimé avec succès (rollback)')
+            }
+          } catch (deleteErr) {
+            console.error('Erreur inattendue lors du rollback:', deleteErr)
+            
+                         // Fallback final : Sauvegarder pour nettoyage manuel
+             try {
+               const { error: finalSaveError } = await supabase
+                 .from('orphaned_auth_accounts')
+                 .insert({
+                   auth_user_id: authUserId,
+                   email: data.email,
+                   created_at: new Date().toISOString(),
+                   reason: 'rollback_failed'
+                 })
+               if (finalSaveError) {
+                 console.error('Échec sauvegarde finale:', finalSaveError)
+               }
+             } catch (finalErr) {
+               console.error('Erreur critique - compte orphelin non sauvegardé:', finalErr)
+             }
+          }
+        }
+        
         throw new Error(`Erreur lors de l'enregistrement: ${insertError.message}`)
       }
 
-console.log('🔥 SUCCÈS INSERTION DIRECTE dans INSCRITS !')
-      console.log('✅ Inscription enregistrée directement:', insertResult)
-      console.log('🔥 AUCUN COMPTE AUTH CRÉÉ - AUCUNE DONNÉE dans INSCRITS_TEMP')
-
-      // 8. Nettoyer les données temporaires (au cas où)
-      try {
-        await supabase
-          .from('inscrits_temp')
-          .delete()
-          .eq('data->email', data.email)
-      } catch (cleanupError) {
-        console.log('Info: Nettoyage données temporaires')
-      }
+      console.log('🔥 SUCCÈS INSCRIPTION COMPLETE !')
+      console.log('✅ Inscription enregistrée:', insertResult)
+      console.log('✅ Compte Auth créé et lié au dossier candidat')
 
       // 9. Message de succès
       toast({
@@ -469,7 +575,7 @@ console.log('🔥 SUCCÈS INSERTION DIRECTE dans INSCRITS !')
                   type="email" 
                   {...register('email')} 
                   className="h-12 bg-white/50 border-slate-200 rounded-xl font-gilroy focus:border-blue-500 focus:ring-blue-500/20" 
-                  placeholder="votre.email@exemple.com"
+                  placeholder="votre.email@domaine.com"
                 />
                 {errors.email && (
                   <p className="text-sm text-red-600 font-gilroy">{errors.email.message}</p>
@@ -656,8 +762,34 @@ console.log('🔥 SUCCÈS INSERTION DIRECTE dans INSCRITS !')
                   <Input 
                     id="photo_identite" 
                     type="file" 
-                    accept="image/jpeg,image/png"
+                    accept="image/jpeg,image/jpg,image/png"
                     {...register('photo_identite')}
+                    onChange={(e) => {
+                      const file = e.target.files?.[0]
+                      if (file) {
+                        console.log('📷 Photo sélectionnée:', { name: file.name, type: file.type, size: file.size })
+                        if (!file.type.startsWith('image/') || file.type === 'application/json') {
+                          toast({
+                            title: '⚠️ Fichier invalide',
+                            description: 'Veuillez sélectionner une image au format JPEG ou PNG.',
+                            variant: 'destructive',
+                          })
+                          e.target.value = '' // Reset le champ
+                          return
+                        }
+                        if (file.size > 2 * 1024 * 1024) {
+                          toast({
+                            title: '⚠️ Fichier trop volumineux',
+                            description: 'La photo ne doit pas dépasser 2 MB.',
+                            variant: 'destructive',
+                          })
+                          e.target.value = '' // Reset le champ
+                          return
+                        }
+                      }
+                      // Appeler le register onChange après validation
+                      register('photo_identite').onChange(e)
+                    }}
                     className="h-12 bg-white/50 border-slate-200 rounded-xl font-gilroy focus:border-blue-500 focus:ring-blue-500/20 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" 
                   />
                   <Image className="absolute right-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-slate-400" />
@@ -676,8 +808,44 @@ console.log('🔥 SUCCÈS INSERTION DIRECTE dans INSCRITS !')
                   <Input 
                     id="attestation_bac" 
                     type="file" 
-                    accept="application/pdf,image/jpeg,image/png"
+                    accept="application/pdf,image/jpeg,image/jpg,image/png"
                     {...register('attestation_bac')}
+                    onChange={(e) => {
+                      const file = e.target.files?.[0]
+                      if (file) {
+                        console.log('📄 Document bac sélectionné:', { name: file.name, type: file.type, size: file.size })
+                        if (file.type === 'application/json') {
+                          toast({
+                            title: '⚠️ Fichier invalide',
+                            description: 'Veuillez sélectionner un document PDF ou une image (JPEG, PNG).',
+                            variant: 'destructive',
+                          })
+                          e.target.value = '' // Reset le champ
+                          return
+                        }
+                        const allowedTypes = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png']
+                        if (!allowedTypes.includes(file.type)) {
+                          toast({
+                            title: '⚠️ Format non supporté',
+                            description: 'Formats acceptés: PDF, JPEG, PNG uniquement.',
+                            variant: 'destructive',
+                          })
+                          e.target.value = '' // Reset le champ
+                          return
+                        }
+                        if (file.size > 5 * 1024 * 1024) {
+                          toast({
+                            title: '⚠️ Fichier trop volumineux',
+                            description: 'Le document ne doit pas dépasser 5 MB.',
+                            variant: 'destructive',
+                          })
+                          e.target.value = '' // Reset le champ
+                          return
+                        }
+                      }
+                      // Appeler le register onChange après validation
+                      register('attestation_bac').onChange(e)
+                    }}
                     className="h-12 bg-white/50 border-slate-200 rounded-xl font-gilroy focus:border-blue-500 focus:ring-blue-500/20 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100" 
                   />
                   <Upload className="absolute right-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-slate-400" />
@@ -778,16 +946,16 @@ console.log('🔥 SUCCÈS INSERTION DIRECTE dans INSCRITS !')
         </div>
 
         {/* Custom Progress Bar */}
-        <div className="w-full max-w-3xl mx-auto" key={`progress-${step}`}>
-          <div className="flex items-center justify-between mb-4">
+        <div className="w-full max-w-3xl mx-auto mb-12" key={`progress-${step}`}>
+          <div className="flex items-center justify-between mb-8">
             {stepTitles.map((title, index) => (
               <div key={index} className="flex flex-col items-center flex-1">
                 <div className={`
                   w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold font-gilroy transition-all duration-500 shadow-lg
                   ${index + 1 < step 
-                    ? 'bg-gradient-to-r from-emerald-500 to-emerald-600 text-white scale-110' 
+                    ? 'bg-gradient-to-r from-green-500 to-green-600 text-white scale-110' 
                     : index + 1 === step 
-                    ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white scale-125 animate-pulse shadow-blue-300' 
+                    ? 'bg-gradient-to-r from-yellow-500 to-yellow-600 text-white scale-125 shadow-yellow-300' 
                     : 'bg-white/80 text-slate-400 border-2 border-slate-200'
                   }
                 `}>
@@ -798,8 +966,8 @@ console.log('🔥 SUCCÈS INSERTION DIRECTE dans INSCRITS !')
                   )}
                 </div>
                 <div className={`
-                  text-xs font-gilroy mt-2 text-center transition-all duration-300 hidden sm:block
-                  ${index + 1 === step ? 'text-blue-600 font-semibold' : 'text-slate-500'}
+                  text-xs font-gilroy mt-3 text-center transition-all duration-300 hidden sm:block
+                  ${index + 1 === step ? 'text-yellow-600 font-semibold' : 'text-slate-500'}
                 `}>
                   {title.split(' ').slice(0, 2).join(' ')}
                 </div>
@@ -808,31 +976,31 @@ console.log('🔥 SUCCÈS INSERTION DIRECTE dans INSCRITS !')
           </div>
           
           {/* Progress Line */}
-          <div className="relative">
-            <div className="absolute top-1/2 left-0 right-0 h-2 bg-gradient-to-r from-slate-200 to-slate-300 rounded-full transform -translate-y-1/2 shadow-inner">
+          <div className="relative mb-6">
+            <div className="absolute top-1/2 left-0 right-0 h-3 bg-gradient-to-r from-slate-200 to-slate-300 rounded-full transform -translate-y-1/2 shadow-inner">
               <div 
-                className="h-full bg-gradient-to-r from-emerald-500 via-blue-500 to-purple-500 rounded-full transition-all duration-700 ease-out shadow-lg relative overflow-hidden"
+                className="h-full bg-gradient-to-r from-green-500 via-yellow-500 to-blue-500 rounded-full transition-all duration-700 ease-out shadow-lg"
                 style={{ width: `${((step - 1) / (totalSteps - 1)) * 100}%` }}
               >
-                <div className="absolute inset-0 bg-gradient-to-r from-white/30 to-transparent animate-pulse"></div>
-                <div className="absolute right-0 top-1/2 transform translate-x-1/2 -translate-y-1/2 w-4 h-4 bg-white rounded-full shadow-lg animate-bounce"></div>
               </div>
             </div>
           </div>
           
           {/* Progress Percentage */}
-          <div className="text-center mt-4">
+          <div className="text-center mt-12">
             <span className="text-lg font-bold text-slate-700 font-gilroy">
               {Math.round((step / totalSteps) * 100)}% complété
             </span>
-            <div className="flex items-center justify-center gap-1 mt-1">
+            <div className="flex items-center justify-center gap-1 mt-3">
               {[...Array(totalSteps)].map((_, index) => (
                 <div
                   key={index}
                   className={`
                     w-2 h-2 rounded-full transition-all duration-300
                     ${index < step 
-                      ? 'bg-emerald-500 scale-125' 
+                      ? index === 0 || index === 1 ? 'bg-green-500 scale-125' 
+                        : index === 2 || index === 3 ? 'bg-yellow-500 scale-125'
+                        : 'bg-blue-500 scale-125'
                       : 'bg-slate-300'
                     }
                   `}

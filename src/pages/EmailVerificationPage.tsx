@@ -117,7 +117,7 @@ const EmailVerificationPage = () => {
                   const { error: updateError } = await supabase
                     .from('inscrits')
                     .update({ 
-                      statut: 'en_attente_validation',
+                      statut: 'en_attente',
                       updated_at: new Date().toISOString()
                     })
                     .eq('numero_dossier', numeroDossier)

@@ -288,7 +288,8 @@ services:
       - ./volumes/db/jwt.sql:/docker-entrypoint-initdb.d/init-scripts/99-jwt.sql:Z
       - ./volumes/db/logs.sql:/docker-entrypoint-initdb.d/migrations/99-logs.sql:Z
       - ./volumes/db/data:/var/lib/postgresql/data:Z
-      - ./iuso-setup.sql:/docker-entrypoint-initdb.d/seed.sql:Z
+      # SEED SQL DÉSACTIVÉ DÉFINITIVEMENT - Pas de données automatiques
+      # - ./iuso-setup.sql:/docker-entrypoint-initdb.d/seed.sql:Z
 
   # Vector database
   vector:

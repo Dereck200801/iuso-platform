@@ -27,14 +27,25 @@ export const useFileUpload = (options: UseFileUploadOptions) => {
   } = options
 
   const validateFile = (file: File): string | null => {
+    // Vérifier que le fichier existe
+    if (!file) {
+      return 'Aucun fichier sélectionné'
+    }
+
     // Vérifier la taille
     if (file.size > maxSize) {
       return `Le fichier est trop volumineux. Taille maximale: ${Math.round(maxSize / 1024 / 1024)}MB`
     }
 
-    // Vérifier le type
+    // Vérifier le type MIME
+    console.log('🔍 Validation file:', { name: file.name, type: file.type, size: file.size })
+    
+    if (!file.type || file.type === 'application/json') {
+      return 'Type de fichier invalide. Veuillez sélectionner un fichier image (JPEG, PNG) ou PDF selon le champ.'
+    }
+
     if (!allowedTypes.includes(file.type as any)) {
-      return 'Type de fichier non autorisé'
+      return `Type de fichier non autorisé. Types acceptés: ${allowedTypes.join(', ')}`
     }
 
     return null

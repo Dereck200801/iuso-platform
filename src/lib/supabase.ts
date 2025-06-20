@@ -21,11 +21,10 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     detectSessionInUrl: true,
     flowType: 'pkce'
   },
-  storage: {
-    cors: {
-      origin: ['http://localhost:3000', 'http://localhost:5173', 'http://localhost:5174', 'http://localhost:5176'],
-      methods: ['GET', 'POST', 'PUT', 'DELETE'],
-      allowedHeaders: ['*']
+  global: {
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
     }
   }
 })

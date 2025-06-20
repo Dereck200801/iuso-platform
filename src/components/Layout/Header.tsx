@@ -22,7 +22,7 @@ import { signOut } from '../../lib/auth'
 import { IUSO_INFO } from '../../lib/constants'
 import toast from 'react-hot-toast'
 import { Button } from '@/components/ui/button'
-import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -33,7 +33,9 @@ import {
 } from '@/components/ui/dropdown-menu'
 // Import du logo IUSO
 import iusoLogo from '../../assets/logo-iuso.png'
-import { SyncIndicator } from '../SyncStatus'
+import { useCandidatData } from '@/hooks/useCandidatData'
+import { supabase } from '@/lib/supabase'
+import React from 'react'
 
 interface HeaderProps {
   onMenuClick?: () => void
@@ -44,6 +46,7 @@ export const Header = ({ onMenuClick }: HeaderProps) => {
   const navigate = useNavigate()
   const location = useLocation()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const { data: candidat } = useCandidatData()
 
   const handleLogout = async () => {
     try {
@@ -89,6 +92,21 @@ export const Header = ({ onMenuClick }: HeaderProps) => {
     return email?.charAt(0).toUpperCase() || 'U'
   }
 
+  // Générer l'URL publique de la photo d'identité si disponible
+  const avatarUrl = React.useMemo(() => {
+    if (candidat?.photo) {
+      try {
+        const { data } = supabase.storage
+          .from('pieces-candidats')
+          .getPublicUrl(candidat.photo)
+        return data.publicUrl || undefined
+      } catch {
+        return undefined
+      }
+    }
+    return undefined
+  }, [candidat?.photo])
+
   const isActiveRoute = (href: string) => {
     return location.pathname === href || location.pathname.startsWith(href + '/')
   }
@@ -99,7 +117,6 @@ export const Header = ({ onMenuClick }: HeaderProps) => {
         <div className="flex h-20 items-center justify-between">
           {/* Logo IUSO officiel */}
           <div className="flex items-center gap-4">
-            <SyncIndicator />
             {onMenuClick && (
               <Button
                 variant="ghost"
@@ -182,6 +199,7 @@ export const Header = ({ onMenuClick }: HeaderProps) => {
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" className="flex items-center gap-2 p-2 hover:bg-slate-50/80 hover:shadow-sm rounded-xl transition-all duration-200 border border-transparent hover:border-slate-200/60">
                       <Avatar className="h-8 w-8 ring-2 ring-slate-200/60 transition-all duration-200 hover:ring-blue-300/60">
+                        {avatarUrl && <AvatarImage src={avatarUrl} alt={user.email || 'avatar'} />}
                         <AvatarFallback className="bg-gradient-to-br from-blue-500 to-blue-600 text-white font-gilroy font-medium">
                           {getInitials(user.email)}
                         </AvatarFallback>
@@ -194,6 +212,7 @@ export const Header = ({ onMenuClick }: HeaderProps) => {
                       <div className="flex flex-col space-y-2">
                         <div className="flex items-center gap-3">
                           <Avatar className="h-10 w-10 flex-shrink-0">
+                            {avatarUrl && <AvatarImage src={avatarUrl} alt={user.email || 'avatar'} />}
                             <AvatarFallback className="bg-gradient-to-br from-blue-500 to-blue-600 text-white font-gilroy">
                               {getInitials(user.email)}
                             </AvatarFallback>
@@ -225,7 +244,7 @@ export const Header = ({ onMenuClick }: HeaderProps) => {
                       <span>Paramètres</span>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem variant="destructive" onClick={handleLogout}>
+                    <DropdownMenuItem onClick={handleLogout}>
                       <LogOut className="h-4 w-4" />
                       <span>Déconnexion</span>
                     </DropdownMenuItem>

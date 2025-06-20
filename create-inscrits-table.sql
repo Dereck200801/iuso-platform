@@ -200,24 +200,7 @@ CREATE POLICY "Administrateurs peuvent tout voir" ON inscrits
 -- DONNÉES DE TEST (OPTIONNEL)
 -- ========================================
 
--- Insérer quelques données de test (décommentez si nécessaire)
-/*
-INSERT INTO inscrits (
-    prenom, nom, genre, date_naissance, lieu_naissance, nationalite,
-    email, telephone, adresse, mot_de_passe, cycle, filiere,
-    statut
-) VALUES 
-(
-    'Jean', 'Dupont', 'Masculin', '2000-05-15', 'Libreville', 'Gabonaise',
-    'jean.dupont@email.com', '+24107123456', '123 Rue de la Paix, Libreville',
-    '$2b$10$example_hashed_password', 'licence1', 'Management', 'en_attente'
-),
-(
-    'Marie', 'Martin', 'Féminin', '1999-12-03', 'Port-Gentil', 'Française',
-    'marie.martin@email.com', '+24107654321', '456 Avenue de l''Indépendance, Port-Gentil',
-    '$2b$10$example_hashed_password', 'dut', 'Carrières Juridiques', 'accepte'
-);
-*/
+-- Données de test supprimées pour éviter les insertions automatiques
 
 -- ========================================
 -- VÉRIFICATION FINALE

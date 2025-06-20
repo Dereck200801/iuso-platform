@@ -1,0 +1,12 @@
+// À ajouter temporairement dans App.tsx pour désactiver l'AutoSync
+// Remplacer la ligne d'initialisation par:
+/*
+const autoSave = initAutoSave({
+  saveInterval: 999999999,        // Très long délai
+  changeDetectionInterval: 999999999, // Très long délai  
+  enableWindowEvents: false,      // Désactiver les événements
+  enablePeriodicSync: false,      // Désactiver la sync périodique
+  enableChangeDetection: false,   // Désactiver la détection de changements
+  storageKeys: []                 // Aucune clé à surveiller
+})
+*/
